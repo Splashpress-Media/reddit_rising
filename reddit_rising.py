@@ -4,8 +4,8 @@ from collections import OrderedDict
 from slackclient import SlackClient
 import praw
 
-reddit = praw.Reddit(client_id='#############',
-                     client_secret='##############',
+reddit = praw.Reddit(client_id='client_id',
+                     client_secret='client_secret',
                      user_agent='Reddit_Rising by /u/easy_c0mpany80')
 
 SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
@@ -27,10 +27,12 @@ def get_reddit():
 	reddit_data = OrderedDict(zip(news_titles, news_urls))
 	
 	print(reddit_data)
-		
-	return reddit_data
 
-def list_channels():
+	
+	return reddit_data
+	
+
+def get_channels():
 	channels_call = slack_client.api_call("channels.list")
 	if channels_call.get('ok'):
 		return channels_call['channels']
@@ -45,18 +47,18 @@ def send_message(channel_id, message):
 		icon_emoji=':robot_face:')
 	
 if __name__ == '__main__':
-	channels = list_channels()
+	channels = get_channels()
 	
 	reddit_data = get_reddit()
 		
 	if channels:
-		print("Channels: ")
 		for channel in channels:
-			print(channel['name'] + ' - ' + channel['id'])	
 			
 			if channel['name'] == 'snd-editorial':
 				if reddit_data:
-					send_message(channel['id'], reddit_data)
+					for k,v in reddit_data.items():
+						send_message(channel['id'], k+v)
+					#send_message(channel['id'], reddit_data)
 			
 	else:
 		print("Unable to authenticate")
