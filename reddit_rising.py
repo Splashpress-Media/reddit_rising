@@ -22,12 +22,10 @@ def get_reddit():
 	for submission in subreddit.rising(limit=3):
 		
 		news_titles.append(str(submission.title.encode('utf-8')))
-		news_urls.append(submission.url)
+		news_urls.append(submission.url.encode('utf-8'))
 		
 	reddit_data = OrderedDict(zip(news_titles, news_urls))
 	
-	print(reddit_data)
-
 	
 	return reddit_data
 	
@@ -58,7 +56,7 @@ if __name__ == '__main__':
 				if reddit_data:
 					for k,v in reddit_data.items():
 						send_message(channel['id'], k+v)
-					#send_message(channel['id'], reddit_data)
+				
 			
 	else:
 		print("Unable to authenticate")
