@@ -4,9 +4,16 @@ from collections import OrderedDict
 from slackclient import SlackClient
 import praw
 
-reddit = praw.Reddit(client_id='client_id',
-                     client_secret='client_secret',
-                     user_agent='Reddit_Rising by /u/easy_c0mpany80')
+#environment variables need to be setup in AWS Lambda options
+PRAW_CLIENT = os.environ.get('PRAW_CLIENT')
+PRAW_SECRET = os.environ.get('PRAW_SECRET')
+PRAW_AGENT = os.environ.get('PRAW_AGENT')
+
+reddit = praw.Reddit(client_id= PRAW_CLIENT,
+                     client_secret= PRAW_SECRET,
+                     user_agent= PRAW_AGENT)
+
+SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 
 SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 
@@ -44,19 +51,18 @@ def send_message(channel_id, message):
 		username='Reddit Rising News Bot',
 		icon_emoji=':robot_face:')
 	
-if __name__ == '__main__':
+def lambda_handler(event, context):
+	print('Inside lambda_handler')
 	channels = get_channels()
-	
+
 	reddit_data = get_reddit()
-		
+
 	if channels:
 		for channel in channels:
-			
 			if channel['name'] == 'snd-editorial':
 				if reddit_data:
 					for k,v in reddit_data.items():
 						send_message(channel['id'], k+v)
-				
-			
+
 	else:
 		print("Unable to authenticate")
